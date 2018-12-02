@@ -6,7 +6,9 @@ var $$Array = require("bs-platform/lib/js/array.js");
 var Block = require("bs-platform/lib/js/block.js");
 var Curry = require("bs-platform/lib/js/curry.js");
 var React = require("react");
+var Caml_format = require("bs-platform/lib/js/caml_format.js");
 var ReasonReact = require("reason-react/src/ReasonReact.js");
+var Js_primitive = require("bs-platform/lib/js/js_primitive.js");
 
 var component = ReasonReact.reducerComponent("Example");
 
@@ -18,6 +20,21 @@ function setStorage(title, score) {
   localStorage.setItem(title, String(score));
   return /* () */0;
 }
+
+function getStorage(name) {
+  return Js_primitive.null_to_opt(localStorage.getItem(name));
+}
+
+function clearStorage(param) {
+  localStorage.clear();
+  return /* () */0;
+}
+
+function getKey(index) {
+  return Js_primitive.null_to_opt(localStorage.key(index));
+}
+
+var lenStorage = localStorage.length;
 
 var lastId = /* record */[/* contents */0];
 
@@ -45,7 +62,8 @@ function make(onSubmit, _children) {
           /* shouldUpdate */component$1[/* shouldUpdate */8],
           /* render */(function (self) {
               return React.createElement("input", {
-                          placeholder: "Name of person",
+                          className: "input is-large is-rounded",
+                          placeholder: "Add a player...",
                           type: "text",
                           value: self[/* state */1],
                           onKeyDown: (function (evt) {
@@ -81,9 +99,9 @@ var PlayerInput = /* module */[
   /* make */make
 ];
 
-var component$2 = ReasonReact.reducerComponent("Player");
+var component$2 = ReasonReact.reducerComponent("ScoreInput");
 
-function make$1(id, name, score, _children) {
+function make$1(onSubmit, _children) {
   return /* record */[
           /* debugName */component$2[/* debugName */0],
           /* reactClassInternal */component$2[/* reactClassInternal */1],
@@ -95,29 +113,103 @@ function make$1(id, name, score, _children) {
           /* willUpdate */component$2[/* willUpdate */7],
           /* shouldUpdate */component$2[/* shouldUpdate */8],
           /* render */(function (self) {
-              return React.createElement("div", undefined, name, React.createElement("button", {
-                              onClick: (function (_event) {
-                                  return Curry._1(self[/* send */3], /* Increase */0);
-                                })
-                            }, String(self[/* state */1])));
+              return React.createElement("input", {
+                          className: "input is-large is-rounded",
+                          type: "number",
+                          value: String(self[/* state */1]),
+                          onKeyDown: (function (evt) {
+                              if (evt.key === "Enter") {
+                                Curry._1(onSubmit, self[/* state */1]);
+                                return Curry._1(self[/* send */3], /* Clear */0);
+                              } else {
+                                return 0;
+                              }
+                            }),
+                          onChange: (function ($$event) {
+                              return Curry._1(self[/* send */3], /* Update */[Caml_format.caml_int_of_string($$event.target.value)]);
+                            })
+                        });
             }),
           /* initialState */(function (param) {
               return 0;
             }),
           /* retainedProps */component$2[/* retainedProps */11],
-          /* reducer */(function (action, state) {
-              return /* Update */Block.__(0, [state + 1 | 0]);
+          /* reducer */(function (action, _state) {
+              if (action) {
+                return /* Update */Block.__(0, [action[0]]);
+              } else {
+                return /* Update */Block.__(0, [0]);
+              }
             }),
           /* jsElementWrapped */component$2[/* jsElementWrapped */13]
         ];
 }
 
-var Player = /* module */[
+var ScoreInput = /* module */[
   /* component */component$2,
   /* make */make$1
 ];
 
-function make$2(greeting, _children) {
+var component$3 = ReasonReact.reducerComponent("Player");
+
+function make$2(name, _children) {
+  return /* record */[
+          /* debugName */component$3[/* debugName */0],
+          /* reactClassInternal */component$3[/* reactClassInternal */1],
+          /* handedOffState */component$3[/* handedOffState */2],
+          /* willReceiveProps */component$3[/* willReceiveProps */3],
+          /* didMount */component$3[/* didMount */4],
+          /* didUpdate */component$3[/* didUpdate */5],
+          /* willUnmount */component$3[/* willUnmount */6],
+          /* willUpdate */component$3[/* willUpdate */7],
+          /* shouldUpdate */component$3[/* shouldUpdate */8],
+          /* render */(function (self) {
+              return React.createElement("div", {
+                          className: "container"
+                        }, React.createElement("div", {
+                              className: "level is-mobile"
+                            }, React.createElement("span", {
+                                  className: "level-left is-size-2"
+                                }, name), React.createElement("div", {
+                                  className: "level-right",
+                                  style: {
+                                    maxWidth: "6rem"
+                                  }
+                                }, ReasonReact.element(undefined, undefined, make$1((function (score) {
+                                            return Curry._1(self[/* send */3], /* Increase */[score]);
+                                          }), /* array */[])))), React.createElement("div", undefined, $$Array.of_list(List.map((function (score) {
+                                        return React.createElement("span", undefined, String(score) + " ");
+                                      }), List.rev(self[/* state */1][/* scores */0])))), "Turns: " + (String(List.length(self[/* state */1][/* scores */0])) + (" Total: " + String(self[/* state */1][/* total */1]))));
+            }),
+          /* initialState */(function (param) {
+              return /* record */[
+                      /* scores : [] */0,
+                      /* total */0
+                    ];
+            }),
+          /* retainedProps */component$3[/* retainedProps */11],
+          /* reducer */(function (action, state) {
+              var score = action[0];
+              var total = state[/* total */1] + score | 0;
+              setStorage(name, total);
+              return /* Update */Block.__(0, [/* record */[
+                          /* scores : :: */[
+                            score,
+                            state[/* scores */0]
+                          ],
+                          /* total */total
+                        ]]);
+            }),
+          /* jsElementWrapped */component$3[/* jsElementWrapped */13]
+        ];
+}
+
+var Player = /* module */[
+  /* component */component$3,
+  /* make */make$2
+];
+
+function make$3(_children) {
   return /* record */[
           /* debugName */component[/* debugName */0],
           /* reactClassInternal */component[/* reactClassInternal */1],
@@ -129,23 +221,68 @@ function make$2(greeting, _children) {
           /* willUpdate */component[/* willUpdate */7],
           /* shouldUpdate */component[/* shouldUpdate */8],
           /* render */(function (self) {
-              return React.createElement("div", undefined, ReasonReact.element(undefined, undefined, make((function ($$event) {
-                                    return Curry._1(self[/* send */3], /* AddPlayer */[$$event]);
-                                  }), /* array */[])), React.createElement("div", undefined, $$Array.of_list(List.map((function (player) {
-                                        return ReasonReact.element(String(player[/* id */0]), undefined, make$1(player[/* id */0], player[/* name */2], player[/* score */1], /* array */[]));
-                                      }), self[/* state */1][/* players */0]))));
+              return React.createElement("div", {
+                          className: "section"
+                        }, React.createElement("div", {
+                              className: "container"
+                            }, "Winner"), React.createElement("div", {
+                              className: "container"
+                            }, ReasonReact.element(undefined, undefined, make((function ($$event) {
+                                        return Curry._1(self[/* send */3], /* AddPlayer */[$$event]);
+                                      }), /* array */[]))), React.createElement("div", {
+                              className: "container"
+                            }, $$Array.of_list(List.map((function (player) {
+                                        return ReasonReact.element(String(player[/* id */0]), undefined, make$2(player[/* name */2], /* array */[]));
+                                      }), List.rev(self[/* state */1][/* players */0])))), React.createElement("button", {
+                              className: "button",
+                              onClick: (function (_event) {
+                                  return Curry._1(self[/* send */3], /* NewGame */0);
+                                })
+                            }, "New Game"), React.createElement("button", {
+                              className: "button is-warning",
+                              onClick: (function (_event) {
+                                  return Curry._1(self[/* send */3], /* EndGame */1);
+                                })
+                            }, "End Game"));
             }),
           /* initialState */(function (param) {
-              return /* record */[/* players : [] */0];
+              return /* record */[
+                      /* players : [] */0,
+                      /* winner */""
+                    ];
             }),
           /* retainedProps */component[/* retainedProps */11],
           /* reducer */(function (action, state) {
-              var name = action[0];
-              setStorage(name, 0);
-              return /* Update */Block.__(0, [/* record */[/* players : :: */[
-                            newPlayer(name),
-                            state[/* players */0]
-                          ]]]);
+              if (typeof action === "number") {
+                if (action !== 0) {
+                  List.map((function (each) {
+                          console.log(each);
+                          return /* () */0;
+                        }), List.map((function (player) {
+                              return /* tuple */[
+                                      player[/* name */2],
+                                      Js_primitive.null_to_opt(localStorage.getItem(player[/* name */2]))
+                                    ];
+                            }), state[/* players */0]));
+                  return /* NoUpdate */0;
+                } else {
+                  localStorage.clear();
+                  return /* Update */Block.__(0, [/* record */[
+                              /* players : [] */0,
+                              /* winner */""
+                            ]]);
+                }
+              } else {
+                var name = action[0];
+                setStorage(name, 0);
+                return /* Update */Block.__(0, [/* record */[
+                            /* players : :: */[
+                              newPlayer(name),
+                              state[/* players */0]
+                            ],
+                            /* winner */state[/* winner */1]
+                          ]]);
+              }
             }),
           /* jsElementWrapped */component[/* jsElementWrapped */13]
         ];
@@ -154,9 +291,14 @@ function make$2(greeting, _children) {
 exports.component = component;
 exports.str = str;
 exports.setStorage = setStorage;
+exports.getStorage = getStorage;
+exports.clearStorage = clearStorage;
+exports.getKey = getKey;
+exports.lenStorage = lenStorage;
 exports.lastId = lastId;
 exports.newPlayer = newPlayer;
 exports.PlayerInput = PlayerInput;
+exports.ScoreInput = ScoreInput;
 exports.Player = Player;
-exports.make = make$2;
+exports.make = make$3;
 /* component Not a pure module */
