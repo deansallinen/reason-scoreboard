@@ -7,7 +7,7 @@ type player = {
 /* State declaration */
 type state = {
   players: list(player),
-  winner: string,
+  winner: bool,
 };
 
 /* Action declaration */
@@ -172,7 +172,7 @@ module Player = {
 
 let make = _children => {
   ...component,
-  initialState: () => {players: [], winner: ""},
+  initialState: () => {players: [], winner: false},
 
   /* State transitions */
   reducer: (action, state) =>
@@ -185,19 +185,23 @@ let make = _children => {
       });
     | NewGame =>
       clearStorage();
-      ReasonReact.Update({winner: "", players: []});
+      ReasonReact.Update({winner: false, players: []});
     | EndGame =>
       List.map(
         player => (player.name, getStorage(player.name)),
         state.players,
       )
       |> List.map(each => Js.log(each));
-      ReasonReact.NoUpdate;
+      ReasonReact.Update({...state, winner: true});
     },
 
   render: self =>
     <div className="section">
-      <div className="container"> {str("Winner")} </div>
+      {
+        self.state.winner ?
+          <div className="container"> {str("Winner")} </div> :
+          ReasonReact.null
+      }
       <div className="container">
         <PlayerInput onSubmit={event => self.send(AddPlayer(event))} />
       </div>

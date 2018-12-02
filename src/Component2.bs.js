@@ -221,11 +221,12 @@ function make$3(_children) {
           /* willUpdate */component[/* willUpdate */7],
           /* shouldUpdate */component[/* shouldUpdate */8],
           /* render */(function (self) {
+              var match = self[/* state */1][/* winner */1];
               return React.createElement("div", {
                           className: "section"
-                        }, React.createElement("div", {
-                              className: "container"
-                            }, "Winner"), React.createElement("div", {
+                        }, match ? React.createElement("div", {
+                                className: "container"
+                              }, "Winner") : null, React.createElement("div", {
                               className: "container"
                             }, ReasonReact.element(undefined, undefined, make((function ($$event) {
                                         return Curry._1(self[/* send */3], /* AddPlayer */[$$event]);
@@ -248,7 +249,7 @@ function make$3(_children) {
           /* initialState */(function (param) {
               return /* record */[
                       /* players : [] */0,
-                      /* winner */""
+                      /* winner */false
                     ];
             }),
           /* retainedProps */component[/* retainedProps */11],
@@ -264,12 +265,15 @@ function make$3(_children) {
                                       Js_primitive.null_to_opt(localStorage.getItem(player[/* name */2]))
                                     ];
                             }), state[/* players */0]));
-                  return /* NoUpdate */0;
+                  return /* Update */Block.__(0, [/* record */[
+                              /* players */state[/* players */0],
+                              /* winner */true
+                            ]]);
                 } else {
                   localStorage.clear();
                   return /* Update */Block.__(0, [/* record */[
                               /* players : [] */0,
-                              /* winner */""
+                              /* winner */false
                             ]]);
                 }
               } else {
